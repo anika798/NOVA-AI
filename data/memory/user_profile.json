@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "description": "User identity and personalization profile",
+  "user_name": "Admin",
+  "preferred_language": "en",
+  "custom_instructions": [],
+  "permissions": {
+    "level": "admin",
+    "allowed_modules": [
+      "core",
+      "filesystem",
+      "memory",
+      "ollama",
+      "voice",
+      "agents"
+    ]
+  }
+}

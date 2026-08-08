@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "description": "Application execution and lifecycle telemetry",
+  "last_boot": "2026-08-07T08:42:57.484165+00:00",
+  "boot_count": 13,
+  "active_modules": [],
+  "health_status": "online",
+  "last_known_ollama_status": "unknown"
+}

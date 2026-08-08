@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "description": "Transient active memory store",
+  "context_buffer": [],
+  "active_session": {
+    "session_id": null,
+    "started_at": null,
+    "interaction_count": 0
+  },
+  "recent_intents": []
+}

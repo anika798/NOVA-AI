@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "NOVA",
+    "version": "1.0.0-day2",
+    "mode": "Development",
+    "debug": true
+  },
+  "logging": {
+    "level": "INFO",
+    "console_output": true,
+    "file_output": true,
+    "log_file": "data/logs/nova.log",
+    "max_bytes": 10485760,
+    "backup_count": 5
+  },
+  "storage": {
+    "base_dir": "data",
+    "memory_dir": "data/memory",
+    "logs_dir": "data/logs"
+  },
+  "ollama": {
+    "host": "localhost",
+    "port": 11434,
+    "model": "qwen2.5:14b",
+    "timeout_seconds": 120,
+    "keep_alive": "30m",
+    "options": {
+      "num_ctx": 2048,
+      "num_predict": 512,
+      "temperature": 0.7,
+      "top_p": 0.9
+    }
+  },
+  "services": {
+    "auto_initialize": true
+  }
+}

@@ -1,0 +1,8 @@
+# Core NOVA Project Dependencies
+# Note: Day 1 core architecture uses Python 3.9+ standard library for zero-dependency operation.
+# Optional enhanced libraries for future modules:
+
+pyyaml>=6.0
+requests>=2.31.0
+pydantic>=2.0.0
+rich>=13.0.0
