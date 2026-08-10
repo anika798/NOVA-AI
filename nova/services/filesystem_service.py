@@ -74,3 +74,13 @@ class FileSystemService(BaseService):
 
     def shutdown(self) -> None:
         self._set_status(ServiceStatus.SHUTDOWN, "FileSystemService stopped")
+
+    def is_safe_path(self, target_path: Any, root_dir: Any = None) -> bool:
+        """
+        Verifies whether target_path stays within root directory boundaries.
+        Preventing path traversal attacks like '../secret.txt'.
+        """
+        from nova.permissions.permission_manager import PermissionManager
+        pm = PermissionManager(workspace_root=root_dir or DATA_DIR.parent)
+        return pm.is_safe_path(target_path)
+

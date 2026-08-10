@@ -1,6 +1,6 @@
 # NOVA (Neural Online Virtual Assistant) - Enterprise AI Platform
 
-NOVA is a production-quality, modular, privacy-focused AI Assistant and Operating System platform. Built on Clean Architecture and Solid design principles, NOVA provides a local-first AI engine, session management, resilient memory persistence, and telemetry monitoring.
+NOVA is a production-quality, modular, privacy-focused AI Assistant and Operating System platform. Built on Clean Architecture and Solid design principles, NOVA provides a local-first AI engine, session management, resilient memory persistence, controlled permission management, path security, and telemetry monitoring.
 
 ---
 
@@ -18,6 +18,7 @@ graph TD
         Services --> Mem[MemoryService]
         Services --> OllamaCheck[OllamaService]
         Services --> AIEngine[AIEngineService]
+        Services --> Perms[PermissionManager]
     end
 
     subgraph AI Engine Subsystem
@@ -27,6 +28,11 @@ graph TD
         AIEngine --> Session[SessionManager]
         AIEngine --> Processor[ResponseProcessor]
         AIEngine --> Status[AIStatusManager]
+    end
+
+    subgraph Security & Permissions
+        Perms --> PathCheck[Path Traversal & Boundary Safety]
+        Perms --> Policy[SAFE / CONFIRM / BLOCKED Policy]
     end
 
     subgraph Persistent Storage
@@ -58,6 +64,12 @@ graph TD
 - **Response Processor (`ResponseProcessor`)**: Normalizes whitespace, extracts fenced code blocks, and calculates word/character telemetry.
 - **AI Status Telemetry (`AIStatusManager`)**: Tracks response latency, request counts, error counts, loaded model, and active session state.
 - **Interactive CLI & Command Mode**: Provides `--chat` interactive session loop and `--prompt "<text>"` execution modes.
+
+### Day 3 Summary (Tool Architecture, Security & Automated Testing)
+- **Permission Manager (`PermissionManager`)**: Action risk classifier (`SAFE`, `CONFIRM`, `BLOCKED`) preventing execution of dangerous commands (e.g., `rm -rf /`, `format`, destructive system commands).
+- **Security & Path Protection**: Enforces workspace boundary validation (`is_safe_path`), blocking path traversal attacks (`../secret.txt`) and unauthorized external absolute paths.
+- **Enhanced Memory Operations**: Dynamic store creation, retrieval, listing, deletion, and auto-discovery of custom memory stores.
+- **Automated Test Suite**: Built-in test suite covering AI engine, memory, permission manager, security path protection, and multi-session subsystems.
 
 ---
 
@@ -100,14 +112,24 @@ Nova-ai/
 │   │   ├── config.py           # ConfigManager
 │   │   ├── logger.py           # LoggerManager & ColoredConsoleFormatter
 │   │   └── service_manager.py  # Service registry & health monitoring
+│   ├── permissions/            # Day 3 Permissions & Security
+│   │   ├── __init__.py
+│   │   └── permission_manager.py # Permission classification & path safety
 │   ├── services/
 │   │   ├── __init__.py
-│   │   ├── filesystem_service.py # Workspace directory verification
-│   │   ├── memory_service.py   # Memory store management
+│   │   ├── filesystem_service.py # Workspace directory verification & path safety
+│   │   ├── memory_service.py   # Memory store management & dynamic discovery
 │   │   └── ollama_service.py   # Ollama daemon probe
 │   └── utils/
 │       ├── __init__.py
 │       └── constants.py         # System constants & exception hierarchy
+├── tests/                      # Automated Unit & Integration Tests
+│   ├── __init__.py
+│   ├── test_ai_engine.py       # AI Engine initialization & mock LLM tests
+│   ├── test_memory.py          # Memory CRUD, persistence, & recovery tests
+│   ├── test_permissions.py     # Permission classification & rule safety tests
+│   ├── test_security.py        # Path traversal & boundary security tests
+│   └── test_sessions.py       # Multi-session creation, loading, & isolation tests
 ├── .gitignore                  # Git ignore rules
 ├── main.py                     # Root CLI entry point
 ├── requirements.txt            # Project dependencies
@@ -123,6 +145,7 @@ Nova-ai/
 - **Default LLM Model**: `qwen2.5:14b`
 - **Network Client**: Standard Library (`urllib.request`) with zero-dependency execution
 - **Storage**: Structured Local JSON (`data/memory/`, `data/memory/sessions/`)
+- **Testing**: Built-in `unittest` Framework (Zero External Test Dependencies)
 
 ---
 
@@ -148,10 +171,28 @@ python main.py --chat
 
 ---
 
-## 🗺️ Next Day Roadmap (Day 3 & Beyond)
+## 🧪 Running Automated Tests
 
-- **Day 3 (Autonomous Code & Execution Context)**: File reading/writing capabilities, workspace context injection into Prompt Builder.
-- **Day 4 (Permission & Security Philosophy)**: Action confirmation system, sandbox execution boundaries.
+NOVA includes a comprehensive automated test suite built with Python's built-in `unittest` framework.
+
+To discover and execute all unit and integration tests:
+
+```bash
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+### What the Test Suite Verifies:
+1. **`test_ai_engine.py`**: Verifies `AIEngineService` initialization, prompt handling, empty prompt guards, and graceful handling of Ollama daemon errors via mocks without making external API calls.
+2. **`test_memory.py`**: Verifies memory creation, retrieval, listing, deletion, disk persistence, and automatic repair of corrupted memory JSON files.
+3. **`test_permissions.py`**: Verifies that `PermissionManager` accepts safe commands (`git status`, `ls`), requests confirmation for state-changing commands, and strictly blocks dangerous system commands (e.g., `rm -rf /`, `format C:`) **without ever executing them**.
+4. **`test_security.py`**: Verifies path traversal protection (`../secret.txt`) and prevents access to files outside the permitted workspace directory.
+5. **`test_sessions.py`**: Verifies independent multi-session creation, switching, disk persistence, and conversation isolation.
+
+---
+
+## 🗺️ Next Day Roadmap (Day 4 & Beyond)
+
+- **Day 4 (Autonomous Code & Execution Context)**: File reading/writing tool execution, workspace context injection into Prompt Builder, sandbox execution boundaries.
 - **Day 5 (Voice & Multi-Modal Processing)**: Voice recognition, wake word, speech synthesis.
 - **Day 6 (Multi-Agent & Task Systems)**: Autonomous sub-agent orchestration and background task runner.
 
@@ -161,3 +202,4 @@ python main.py --chat
 
 - **v1.0.0-day1**: Initial foundation (Config, Logger, ServiceManager, FileSystem, Memory, Ollama Probe).
 - **v1.0.0-day2**: Added AI Engine (`AIEngineService`), OllamaClient, PromptBuilder, SystemPromptManager, SessionManager, ConversationManager, ResponseProcessor, and interactive CLI.
+- **v1.0.0-day3**: Added `PermissionManager`, path security validation (`is_safe_path`), memory store listing/deletion/recovery, and automated test suite (`tests/`).

@@ -58,8 +58,16 @@ class MemoryService(BaseService):
                     "valid_json": True,
                 }
 
+            # Discover and load any existing custom memory files
+            for json_file in self.memory_dir.glob("*.json"):
+                fn = json_file.name
+                if fn not in self._loaded_memories:
+                    self._memory_files[fn] = json_file
+                    self._validate_and_load_memory(json_file, fn, {})
+
             # Update system state file with boot timestamp
             self._update_boot_telemetry()
+
 
             details = {
                 "memory_dir": str(self.memory_dir),
@@ -94,8 +102,8 @@ class MemoryService(BaseService):
     def save_memory(self, name: str, data: Dict[str, Any]) -> bool:
         """Saves dictionary data to target memory JSON file."""
         if name not in self._memory_files:
-            logger.error(f"Unknown memory store name: {name}")
-            return False
+            file_path = self.memory_dir / name
+            self._memory_files[name] = file_path
 
         file_path = self._memory_files[name]
         try:
@@ -107,8 +115,33 @@ class MemoryService(BaseService):
             logger.error(f"Failed to write memory file {name}: {e}")
             return False
 
+    def list_memories(self) -> List[str]:
+        """Returns list of all available memory store names."""
+        return list(self._loaded_memories.keys())
+
+    def delete_memory(self, name: str) -> bool:
+        """Deletes target memory store from cache and local file system."""
+        deleted = False
+        if name in self._loaded_memories:
+            del self._loaded_memories[name]
+            deleted = True
+
+        if name in self._memory_files:
+            file_path = self._memory_files[name]
+            del self._memory_files[name]
+            if file_path.exists():
+                try:
+                    file_path.unlink()
+                    return True
+                except OSError as e:
+                    logger.error(f"Failed to delete memory file {name}: {e}")
+                    return False
+            return True
+        return deleted
+
     def shutdown(self) -> None:
         self._set_status(ServiceStatus.SHUTDOWN, "MemoryService stopped")
+
 
     def _create_memory_file(self, path: Path, default_data: Dict[str, Any]) -> None:
         """Creates a new memory file formatted with default JSON schema."""

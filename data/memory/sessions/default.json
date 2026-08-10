@@ -2,7 +2,7 @@
   "session_id": "default",
   "name": "Default Session",
   "created_at": "2026-08-07T07:50:30.782037+00:00",
-  "updated_at": "2026-08-07T09:09:40.026803+00:00",
+  "updated_at": "2026-08-08T10:22:46.545831+00:00",
   "messages": [
     {
       "role": "user",
@@ -190,6 +190,124 @@
       "timestamp": "2026-08-07T09:08:59.425174+00:00",
       "metadata": {
         "latency_ms": 58715.261459350586
+      }
+    },
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": "2026-08-08T09:47:52.808152+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "user",
+      "content": "heloo",
+      "timestamp": "2026-08-08T09:50:31.957374+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello. It seems there might be a typo. Did you mean to say \"hello\"? How can I assist you today?",
+      "timestamp": "2026-08-08T09:50:52.651347+00:00",
+      "metadata": {
+        "latency_ms": 20693.90368461609
+      }
+    },
+    {
+      "role": "user",
+      "content": "Hello NOVA",
+      "timestamp": "2026-08-08T10:08:22.679768+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I am NOVA.",
+      "timestamp": "2026-08-08T10:08:22.679836+00:00",
+      "metadata": {
+        "latency_ms": 0.03600120544433594
+      }
+    },
+    {
+      "role": "user",
+      "content": "Hello NOVA",
+      "timestamp": "2026-08-08T10:08:34.328604+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I am NOVA.",
+      "timestamp": "2026-08-08T10:08:34.328656+00:00",
+      "metadata": {
+        "latency_ms": 0.02384185791015625
+      }
+    },
+    {
+      "role": "user",
+      "content": "Hello NOVA",
+      "timestamp": "2026-08-08T10:08:46.308005+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I am NOVA.",
+      "timestamp": "2026-08-08T10:08:46.308049+00:00",
+      "metadata": {
+        "latency_ms": 0.018835067749023438
+      }
+    },
+    {
+      "role": "user",
+      "content": "Hello NOVA",
+      "timestamp": "2026-08-08T10:09:35.686881+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I am NOVA.",
+      "timestamp": "2026-08-08T10:09:35.686976+00:00",
+      "metadata": {
+        "latency_ms": 0.021219253540039062
+      }
+    },
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": "2026-08-08T10:10:24.900285+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Hello. How can I assist you today?",
+      "timestamp": "2026-08-08T10:10:51.240822+00:00",
+      "metadata": {
+        "latency_ms": 26340.4438495636
+      }
+    },
+    {
+      "role": "user",
+      "content": "what different from previose to now",
+      "timestamp": "2026-08-08T10:11:51.554597+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "There hasn't been any change in our interaction since your last message. If you're asking about the difference between previous and current states, please clarify what specific aspect or context you are referring to.\n\nHow can I help you further?",
+      "timestamp": "2026-08-08T10:12:26.569441+00:00",
+      "metadata": {
+        "latency_ms": 35014.774799346924
+      }
+    },
+    {
+      "role": "user",
+      "content": "give me one simple java code",
+      "timestamp": "2026-08-08T10:16:10.729655+00:00",
+      "metadata": {}
+    },
+    {
+      "role": "assistant",
+      "content": "Certainly! Here's a simple Java program that prints \"Hello, World!\" to the console:\n\n```java\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n```\n\nThis is a basic example of a Java application. If you need more details or another type of code snippet, let me know!",
+      "timestamp": "2026-08-08T10:17:04.941378+00:00",
+      "metadata": {
+        "latency_ms": 54211.62009239197
       }
     }
   ]
