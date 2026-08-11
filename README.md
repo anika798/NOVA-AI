@@ -1,6 +1,6 @@
 # NOVA (Neural Online Virtual Assistant) - Enterprise AI Platform
 
-NOVA is a production-quality, modular, privacy-focused AI Assistant and Operating System platform. Built on Clean Architecture and Solid design principles, NOVA provides a local-first AI engine, session management, resilient memory persistence, controlled permission management, path security, and telemetry monitoring.
+NOVA is a production-quality, modular, privacy-focused AI Assistant and Operating System platform. Built on Clean Architecture and SOLID design principles, NOVA provides a local-first AI engine, session management, resilient memory persistence, controlled permission management, path security, isolated environment management, dependency auto-detection, error classification, self-debugging, and telemetry monitoring.
 
 ---
 
@@ -19,6 +19,7 @@ graph TD
         Services --> OllamaCheck[OllamaService]
         Services --> AIEngine[AIEngineService]
         Services --> Perms[PermissionManager]
+        Services --> Agent[CodingAgent]
     end
 
     subgraph AI Engine Subsystem
@@ -30,14 +31,27 @@ graph TD
         AIEngine --> Status[AIStatusManager]
     end
 
+    subgraph Environment & Execution Subsystem
+        Agent --> EnvMgr[EnvironmentManager]
+        Agent --> DepMgr[DependencyManager]
+        Agent --> Runner[ProjectRunner]
+        Agent --> ErrAnalyzer[ErrorAnalyzer]
+        Agent --> TestRunner[TestRunner]
+        Agent --> StateMgr[ProjectStateManager]
+    end
+
     subgraph Security & Permissions
         Perms --> PathCheck[Path Traversal & Boundary Safety]
         Perms --> Policy[SAFE / CONFIRM / BLOCKED Policy]
+        EnvMgr --> Perms
+        DepMgr --> Perms
+        Runner --> Perms
     end
 
     subgraph Persistent Storage
         Mem --> MemoryFiles[data/memory/*.json]
         Session --> SessionFiles[data/memory/sessions/*.json]
+        StateMgr --> ProjectState[data/memory/project_state.json]
         Logger --> LogFiles[data/logs/nova.log]
     end
 
@@ -65,11 +79,21 @@ graph TD
 - **AI Status Telemetry (`AIStatusManager`)**: Tracks response latency, request counts, error counts, loaded model, and active session state.
 - **Interactive CLI & Command Mode**: Provides `--chat` interactive session loop and `--prompt "<text>"` execution modes.
 
-### Day 3 Summary (Tool Architecture, Security & Automated Testing)
+### Day 3 Summary (Tool Architecture, Security & Initial Test Suite)
 - **Permission Manager (`PermissionManager`)**: Action risk classifier (`SAFE`, `CONFIRM`, `BLOCKED`) preventing execution of dangerous commands (e.g., `rm -rf /`, `format`, destructive system commands).
 - **Security & Path Protection**: Enforces workspace boundary validation (`is_safe_path`), blocking path traversal attacks (`../secret.txt`) and unauthorized external absolute paths.
 - **Enhanced Memory Operations**: Dynamic store creation, retrieval, listing, deletion, and auto-discovery of custom memory stores.
 - **Automated Test Suite**: Built-in test suite covering AI engine, memory, permission manager, security path protection, and multi-session subsystems.
+
+### Day 4 Summary (Environment Manager, Dependency Manager & Autonomous Coding Workflow)
+- **Environment Manager (`EnvironmentManager`)**: Language detection (Python, Node.js, Java), Python version discovery, virtual environment detection (`.venv`, `venv`, `env`), permission-controlled `.venv` creation, and health checks.
+- **Dependency Manager (`DependencyManager`)**: Manifest parsing (`requirements.txt`, `pyproject.toml`, `Pipfile`), missing package detection, permission-controlled `pip install` into project `.venv`, and installation verification.
+- **Project Runner (`ProjectRunner`)**: Entry point discovery (`main.py`, `app.py`, `run.py`), safe process execution within active environments, stdout/stderr/exit_code capture, and timeout guards.
+- **Error Analyzer (`ErrorAnalyzer`)**: Automated classification of error types (`SyntaxError`, `ModuleNotFoundError`, `ImportError`, `FileNotFoundError`, `TypeError`, `RuntimeError`, etc.) and structured cause/fix recommendations.
+- **Test Runner (`TestRunner`)**: Execution of `unittest` and `pytest` test suites with output parsing (passed, failed, skipped, errors, execution time).
+- **Project State Manager (`ProjectStateManager`)**: Workspace task tracking, active environment state, installed dependencies, modified files, execution/test history, and JSON persistence (`data/memory/project_state.json`).
+- **Autonomous Coding Agent (`CodingAgent`)**: End-to-end autonomous workflow (`UNDERSTAND -> DETECT ENVIRONMENT -> DETECT DEPENDENCIES -> PLAN -> PERMISSION CHECK -> PREPARE ENVIRONMENT -> INSTALL DEPENDENCIES -> RUN -> CLASSIFY ERROR -> PROPOSE FIX -> PERMISSION -> APPLY FIX -> VERIFY -> SAVE MEMORY`) with self-debugging loop capped at `MAX_DEBUG_ATTEMPTS = 3`.
+- **Comprehensive Day 4 Test Suite**: 26 new automated unit and end-to-end integration tests (bringing total suite to 48 tests).
 
 ---
 
@@ -84,6 +108,7 @@ Nova-ai/
 │   │   └── nova.log            # Rotating application log
 │   └── memory/
 │       ├── long_term.json      # Persistent knowledge & facts
+│       ├── project_state.json  # Workspace task & environment state
 │       ├── short_term.json     # Active session buffer
 │       ├── system_state.json   # Boot & execution telemetry
 │       ├── user_profile.json   # User identity & custom directives
@@ -95,6 +120,9 @@ Nova-ai/
 │   ├── __main__.py             # Module entry point
 │   ├── banner.py               # Visual startup banner renderer
 │   ├── bootstrap.py            # Application bootstrap orchestrator
+│   ├── agent/                  # Day 4 Coding Agent Subsystem
+│   │   ├── __init__.py
+│   │   └── coding_agent.py     # End-to-end autonomous coding workflow
 │   ├── ai/                     # Day 2 AI Subsystem
 │   │   ├── __init__.py
 │   │   ├── ai_status_manager.py # Performance telemetry
@@ -112,9 +140,19 @@ Nova-ai/
 │   │   ├── config.py           # ConfigManager
 │   │   ├── logger.py           # LoggerManager & ColoredConsoleFormatter
 │   │   └── service_manager.py  # Service registry & health monitoring
+│   ├── environment/            # Day 4 Environment & Dependency Subsystems
+│   │   ├── __init__.py
+│   │   ├── dependency_manager.py # Manifest parsing & permission pip install
+│   │   └── environment_manager.py # Language & venv detection / creation
 │   ├── permissions/            # Day 3 Permissions & Security
 │   │   ├── __init__.py
 │   │   └── permission_manager.py # Permission classification & path safety
+│   ├── project/                # Day 4 Project Runner & Error Analysis
+│   │   ├── __init__.py
+│   │   ├── error_analyzer.py   # Error classification & root cause analysis
+│   │   ├── project_runner.py   # Entry point discovery & process runner
+│   │   ├── state_manager.py    # Workspace state persistence
+│   │   └── test_runner.py      # unittest/pytest test runner & telemetry
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── filesystem_service.py # Workspace directory verification & path safety
@@ -126,8 +164,14 @@ Nova-ai/
 ├── tests/                      # Automated Unit & Integration Tests
 │   ├── __init__.py
 │   ├── test_ai_engine.py       # AI Engine initialization & mock LLM tests
+│   ├── test_day4_e2e.py        # Day 4 end-to-end autonomous workflow test
+│   ├── test_debugging_workflow.py # Self-debugging loop & retry cap tests
+│   ├── test_dependencies.py    # Dependency parsing & installation permission tests
+│   ├── test_environment.py     # Environment detection & venv creation tests
+│   ├── test_error_analyzer.py  # Error classification & analysis tests
 │   ├── test_memory.py          # Memory CRUD, persistence, & recovery tests
 │   ├── test_permissions.py     # Permission classification & rule safety tests
+│   ├── test_project_runner.py  # Process execution & output capture tests
 │   ├── test_security.py        # Path traversal & boundary security tests
 │   └── test_sessions.py       # Multi-session creation, loading, & isolation tests
 ├── .gitignore                  # Git ignore rules
@@ -171,9 +215,22 @@ python main.py --chat
 
 ---
 
+## 🔒 Security Model & Permission Architecture
+
+NOVA strictly enforces boundary discipline and permission checks across all operations:
+
+1. **Permission Levels**:
+   - **`SAFE`**: Read-only operations (file reading, directory scanning, `git status`, `ls`). Executed automatically.
+   - **`CONFIRM`**: State-changing operations (file modification, environment creation, `pip install`, program execution). Requires explicit user approval (`YES`/`NO`).
+   - **`BLOCKED`**: Destructive system actions (e.g., `rm -rf /`, `format C:`, system shutdown, directory traversal). Blocked automatically.
+2. **Workspace Isolation**: All file operations and environment creations are checked against `is_safe_path()` to ensure execution remains strictly within the workspace root.
+3. **No Silent Actions**: Dependency installations and environment creations are never performed silently or globally without user permission.
+
+---
+
 ## 🧪 Running Automated Tests
 
-NOVA includes a comprehensive automated test suite built with Python's built-in `unittest` framework.
+NOVA includes a comprehensive automated test suite of **48 unit and integration tests** built with Python's built-in `unittest` framework.
 
 To discover and execute all unit and integration tests:
 
@@ -181,18 +238,23 @@ To discover and execute all unit and integration tests:
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-### What the Test Suite Verifies:
-1. **`test_ai_engine.py`**: Verifies `AIEngineService` initialization, prompt handling, empty prompt guards, and graceful handling of Ollama daemon errors via mocks without making external API calls.
-2. **`test_memory.py`**: Verifies memory creation, retrieval, listing, deletion, disk persistence, and automatic repair of corrupted memory JSON files.
-3. **`test_permissions.py`**: Verifies that `PermissionManager` accepts safe commands (`git status`, `ls`), requests confirmation for state-changing commands, and strictly blocks dangerous system commands (e.g., `rm -rf /`, `format C:`) **without ever executing them**.
-4. **`test_security.py`**: Verifies path traversal protection (`../secret.txt`) and prevents access to files outside the permitted workspace directory.
-5. **`test_sessions.py`**: Verifies independent multi-session creation, switching, disk persistence, and conversation isolation.
+### Test Suite Coverage:
+1. **`test_ai_engine.py`**: AI Engine initialization, prompt execution, empty prompt guards, and Ollama daemon error handling.
+2. **`test_memory.py`**: Memory store CRUD, JSON persistence, and corrupted file recovery.
+3. **`test_permissions.py`**: Permission level classification and dangerous command rejection.
+4. **`test_security.py`**: Path traversal protection (`../secret.txt`) and workspace boundary enforcement.
+5. **`test_sessions.py`**: Independent multi-session creation, switching, disk loading, and history isolation.
+6. **`test_environment.py`**: Python interpreter detection, venv detection, `.venv` creation, and environment health checks.
+7. **`test_dependencies.py`**: `requirements.txt` and `pyproject.toml` parsing, missing package detection, and installation permission guards.
+8. **`test_project_runner.py`**: Entry point discovery (`main.py`), process execution, stdout/stderr capture, and timeout guards.
+9. **`test_error_analyzer.py`**: Classification of syntax errors, missing module errors, import errors, file errors, and clean exit handling.
+10. **`test_debugging_workflow.py`**: Self-debugging loop, missing module auto-recommendation, and retry counter cap (`MAX_DEBUG_ATTEMPTS = 3`).
+11. **`test_day4_e2e.py`**: Complete end-to-end lifecycle test covering project analysis, environment preparation, dependency check, execution, state persistence, and memory recording.
 
 ---
 
-## 🗺️ Next Day Roadmap (Day 4 & Beyond)
+## 🗺️ Next Day Roadmap (Day 5 & Beyond)
 
-- **Day 4 (Autonomous Code & Execution Context)**: File reading/writing tool execution, workspace context injection into Prompt Builder, sandbox execution boundaries.
 - **Day 5 (Voice & Multi-Modal Processing)**: Voice recognition, wake word, speech synthesis.
 - **Day 6 (Multi-Agent & Task Systems)**: Autonomous sub-agent orchestration and background task runner.
 
@@ -202,4 +264,5 @@ python -m unittest discover -s tests -p "test_*.py"
 
 - **v1.0.0-day1**: Initial foundation (Config, Logger, ServiceManager, FileSystem, Memory, Ollama Probe).
 - **v1.0.0-day2**: Added AI Engine (`AIEngineService`), OllamaClient, PromptBuilder, SystemPromptManager, SessionManager, ConversationManager, ResponseProcessor, and interactive CLI.
-- **v1.0.0-day3**: Added `PermissionManager`, path security validation (`is_safe_path`), memory store listing/deletion/recovery, and automated test suite (`tests/`).
+- **v1.0.0-day3**: Added `PermissionManager`, path security validation (`is_safe_path`), memory store listing/deletion/recovery, and initial test suite (`tests/`).
+- **v1.0.0-day4**: Added `EnvironmentManager`, `DependencyManager`, `ProjectRunner`, `ErrorAnalyzer`, `TestRunner`, `ProjectStateManager`, `CodingAgent` workflow, self-debugging loop, and comprehensive Day 4 test suite.

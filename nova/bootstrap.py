@@ -52,7 +52,7 @@ class ApplicationBootstrap:
                 file_output=self.config_manager.get("logging.file_output", True),
             )
 
-            logger.info("Initializing NOVA Application (Day 2 AI Architecture)...")
+            logger.info("Initializing NOVA Application (Day 4 Environment & Coding Agent Architecture)...")
 
             # Step 3: Service Registry Instantiation
             self.service_manager = ServiceManager()
@@ -62,13 +62,20 @@ class ApplicationBootstrap:
             mem_service = MemoryService(self.config_manager)
             ollama_service = OllamaService(self.config_manager)
 
-            # Step 5: Register AI Engine Service
+            # Step 5: Register AI Engine Service & Coding Agent
             self.ai_engine = AIEngineService(self.config_manager, memory_service=mem_service)
+
+            from nova.permissions.permission_manager import PermissionManager
+            from nova.agent.coding_agent import CodingAgent
+
+            self.permission_manager = PermissionManager()
+            self.coding_agent = CodingAgent(permission_manager=self.permission_manager, memory_service=mem_service)
 
             self.service_manager.register(fs_service)
             self.service_manager.register(mem_service)
             self.service_manager.register(ollama_service)
             self.service_manager.register(self.ai_engine)
+
 
             # Step 6: Initialize All Registered Services
             init_results = self.service_manager.initialize_all()

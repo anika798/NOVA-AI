@@ -8,7 +8,7 @@ from typing import Dict, Any
 # Application Metadata
 APP_NAME = "NOVA"
 APP_DESCRIPTION = "Neural Online Virtual Assistant"
-APP_VERSION = "1.0.0-day2"
+APP_VERSION = "1.0.0-day4"
 DEFAULT_MODE = "Development"
 
 # Paths
@@ -65,6 +65,21 @@ DEFAULT_MEMORY_SCHEMAS: Dict[str, Dict[str, Any]] = {
         "active_modules": [],
         "health_status": "initialized",
         "last_known_ollama_status": "unknown"
+    },
+    "project_state.json": {
+        "version": "1.0",
+        "description": "Active workspace execution state, task tracking, and debugging telemetry",
+        "project_path": None,
+        "current_task": None,
+        "status": "IDLE",
+        "environment": {},
+        "dependencies": {},
+        "modified_files": [],
+        "last_execution": None,
+        "last_test_result": None,
+        "known_errors": [],
+        "debug_attempts": 0,
+        "last_updated": None
     }
 }
 
