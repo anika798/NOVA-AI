@@ -37,8 +37,8 @@ class ConfigManager:
         "ollama": {
             "host": "localhost",
             "port": 11434,
-            "model": "qwen2.5:14b",
-            "timeout_seconds": 5,
+            "model": "qwen2.5:7b",
+            "timeout_seconds": 120,
         },
         "services": {
             "auto_initialize": True,

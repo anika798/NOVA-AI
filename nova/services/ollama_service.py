@@ -24,7 +24,7 @@ class OllamaService(BaseService):
         self.config_manager = config_manager
         self.host: str = config_manager.get("ollama.host", "localhost")
         self.port: int = config_manager.get("ollama.port", 11434)
-        self.configured_model: str = config_manager.get("ollama.model", "qwen2.5:14b")
+        self.configured_model: str = config_manager.get("ollama.model", "qwen2.5:7b")
         self.timeout: int = config_manager.get("ollama.timeout_seconds", 5)
 
         self._base_url: str = f"http://{self.host}:{self.port}"

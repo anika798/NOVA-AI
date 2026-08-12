@@ -34,14 +34,17 @@ class AIEngineService(BaseService):
         # Read configuration parameters dynamically
         host = config_manager.get("ollama.host", "localhost")
         port = config_manager.get("ollama.port", 11434)
-        timeout = config_manager.get("ollama.timeout_seconds", 300)
-        keep_alive = config_manager.get("ollama.keep_alive", "30m")
-        self.target_model = config_manager.get("ollama.model", "qwen2.5:14b")
+        timeout = config_manager.get("ollama.timeout_seconds", 120)
+        keep_alive = config_manager.get("ollama.keep_alive", "60m")
+        self.target_model = config_manager.get("ollama.model", "qwen2.5:7b")
+        self.history_limit = config_manager.get("ollama.history_limit", 6)
         self.options = config_manager.get("ollama.options", {
-            "num_ctx": 2048,
-            "num_predict": 512,
+            "num_ctx": 1024,
+            "num_predict": 256,
             "temperature": 0.7,
             "top_p": 0.9,
+            "num_batch": 512,
+            "num_gpu": 999,
         })
 
         # Sub-modules
@@ -53,10 +56,11 @@ class AIEngineService(BaseService):
 
     def initialize(self) -> bool:
         # Re-read options in initialize after config file load
-        self.target_model = self.config_manager.get("ollama.model", "qwen2.5:14b")
+        self.target_model = self.config_manager.get("ollama.model", "qwen2.5:7b")
         self.options = self.config_manager.get("ollama.options", self.options)
-        self.client.timeout = self.config_manager.get("ollama.timeout_seconds", 300)
-        self.client.keep_alive = self.config_manager.get("ollama.keep_alive", "30m")
+        self.history_limit = self.config_manager.get("ollama.history_limit", 6)
+        self.client.timeout = self.config_manager.get("ollama.timeout_seconds", 120)
+        self.client.keep_alive = self.config_manager.get("ollama.keep_alive", "60m")
 
         self._set_status(ServiceStatus.INITIALIZING, f"Connecting AI Engine to Ollama (Target model: {self.target_model})")
         logger.info(f"Initializing AI Engine Service (Target model: {self.target_model})...")
@@ -97,6 +101,40 @@ class AIEngineService(BaseService):
             self._set_status(ServiceStatus.FAILED, msg, details=details)
             return False
 
+    def warmup(self) -> bool:
+        """
+        Pre-heats target LLM model in Ollama memory/GPU VRAM to eliminate initial prompt cold-start latency.
+        """
+        if not self.is_healthy:
+            logger.warning("Skipping model warmup because AI Engine is not healthy.")
+            return False
+
+        logger.info(f"Pre-heating target model '{self.target_model}' into memory/GPU VRAM...")
+        try:
+            # Issue lightweight 1-token query with num_predict=1 to load model into VRAM
+            self.client.generate(
+                model=self.target_model,
+                prompt="hi",
+                options={**self.options, "num_predict": 1},
+            )
+            logger.info(f"Model '{self.target_model}' pre-heated and warm in VRAM.")
+            return True
+        except Exception as e:
+            logger.warning(f"Model warmup failed: {e}")
+            return False
+
+    def set_model(self, model_name: str) -> bool:
+        """
+        Dynamically changes active target model.
+        """
+        model_name = model_name.strip()
+        if not model_name:
+            return False
+        self.target_model = model_name
+        self.status_manager.target_model = model_name
+        logger.info(f"Target AI model switched to '{self.target_model}'")
+        return True
+
     def chat(self, user_input: str, session_id: Optional[str] = None) -> ProcessedResponse:
         """
         Non-streaming multi-turn conversation entry point.
@@ -114,7 +152,7 @@ class AIEngineService(BaseService):
         try:
             messages = self.prompt_builder.build_chat_messages(
                 user_input=user_input,
-                history=conv.get_history(),
+                history=conv.get_history(limit=self.history_limit),
                 memory_context=memory_ctx,
             )
 
@@ -173,7 +211,7 @@ class AIEngineService(BaseService):
 
         messages = self.prompt_builder.build_chat_messages(
             user_input=user_input,
-            history=conv.get_history(),
+            history=conv.get_history(limit=self.history_limit),
             memory_context=memory_ctx,
         )
 

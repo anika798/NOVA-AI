@@ -34,7 +34,7 @@ class TestAIEngineService(unittest.TestCase):
 
         self.assertTrue(success)
         self.assertTrue(engine.is_healthy)
-        self.assertEqual(engine.target_model, "qwen2.5:14b")
+        self.assertEqual(engine.target_model, "qwen2.5:7b")
 
     @patch("nova.ai.engine.OllamaClient.check_connection")
     def test_ai_engine_initialization_failure(self, mock_check_conn):
@@ -106,6 +106,26 @@ class TestAIEngineService(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertIn("Could not communicate with local Ollama server", response.cleaned_content)
 
+    @patch("nova.ai.engine.OllamaClient.generate")
+    @patch("nova.ai.engine.OllamaClient.check_connection")
+    @patch("nova.ai.engine.OllamaClient.is_model_available")
+    def test_warmup_functionality(self, mock_is_model, mock_check_conn, mock_generate):
+        mock_check_conn.return_value = (True, "0.1.30")
+        mock_is_model.return_value = True
+
+        engine = AIEngineService(self.config_manager)
+        engine.initialize()
+        result = engine.warmup()
+
+        self.assertTrue(result)
+        mock_generate.assert_called_once()
+
+    def test_set_model(self):
+        engine = AIEngineService(self.config_manager)
+        self.assertTrue(engine.set_model("qwen2.5:3b"))
+        self.assertEqual(engine.target_model, "qwen2.5:3b")
+
 
 if __name__ == "__main__":
     unittest.main()
+

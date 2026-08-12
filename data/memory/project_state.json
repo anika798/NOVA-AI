@@ -1,22 +1,22 @@
 {
   "version": "1.0",
-  "project_path": "C:\\Users\\Admin\\AppData\\Local\\Temp\\tmppsm_0ifi\\workspace",
+  "project_path": "C:\\Users\\manis\\AppData\\Local\\Temp\\tmpqmosm_76\\workspace",
   "current_task": "Run hello world app",
   "status": "COMPLETED_SUCCESS",
   "environment": {
     "status": "Degraded",
     "language": "Python",
-    "python_executable": "C:\\Users\\Admin\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
-    "python_version": "3.13.14",
+    "python_executable": "C:\\Users\\manis\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_version": "3.13.12",
     "virtual_environment": "None",
     "pip_available": true,
-    "pip_version": "pip 26.0.1 from C:\\Users\\Admin\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\pip (python 3.13)",
+    "pip_version": "pip 25.3 from C:\\Users\\manis\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pip (python 3.13)",
     "details": {
-      "workspace_root": "C:\\Users\\Admin\\AppData\\Local\\Temp\\tmppsm_0ifi\\workspace",
+      "workspace_root": "C:\\Users\\manis\\AppData\\Local\\Temp\\tmpqmosm_76\\workspace",
       "venv_found": false,
       "venv_path": null,
-      "python_executable": "C:\\Users\\Admin\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
-      "python_version": "3.13.14",
+      "python_executable": "C:\\Users\\manis\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "python_version": "3.13.12",
       "is_virtual_env": false
     }
   },
@@ -35,11 +35,11 @@
     "exit_code": 0,
     "stdout": "Hello Coding Agent\n",
     "stderr": "",
-    "execution_time_ms": 162.56,
+    "execution_time_ms": 46.48,
     "process_status": "COMPLETED_SUCCESS"
   },
   "last_test_result": null,
   "known_errors": [],
   "debug_attempts": 0,
-  "last_updated": "2026-08-11T09:04:02.129148+00:00"
+  "last_updated": "2026-08-12T07:07:48.239928+00:00"
 }
