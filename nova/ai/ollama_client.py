@@ -23,7 +23,7 @@ class OllamaClient:
         self,
         host: str = "localhost",
         port: int = 11434,
-        timeout: int = 120,
+        timeout: int = 300,
         max_retries: int = 2,
         keep_alive: str = "30m",
     ):

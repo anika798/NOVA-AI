@@ -34,7 +34,7 @@ class AIEngineService(BaseService):
         # Read configuration parameters dynamically
         host = config_manager.get("ollama.host", "localhost")
         port = config_manager.get("ollama.port", 11434)
-        timeout = config_manager.get("ollama.timeout_seconds", 120)
+        timeout = config_manager.get("ollama.timeout_seconds", 300)
         keep_alive = config_manager.get("ollama.keep_alive", "30m")
         self.target_model = config_manager.get("ollama.model", "qwen2.5:14b")
         self.options = config_manager.get("ollama.options", {
@@ -55,7 +55,7 @@ class AIEngineService(BaseService):
         # Re-read options in initialize after config file load
         self.target_model = self.config_manager.get("ollama.model", "qwen2.5:14b")
         self.options = self.config_manager.get("ollama.options", self.options)
-        self.client.timeout = self.config_manager.get("ollama.timeout_seconds", 120)
+        self.client.timeout = self.config_manager.get("ollama.timeout_seconds", 300)
         self.client.keep_alive = self.config_manager.get("ollama.keep_alive", "30m")
 
         self._set_status(ServiceStatus.INITIALIZING, f"Connecting AI Engine to Ollama (Target model: {self.target_model})")

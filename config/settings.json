@@ -22,7 +22,7 @@
     "host": "localhost",
     "port": 11434,
     "model": "qwen2.5:14b",
-    "timeout_seconds": 120,
+    "timeout_seconds": 300,
     "keep_alive": "30m",
     "options": {
       "num_ctx": 2048,
